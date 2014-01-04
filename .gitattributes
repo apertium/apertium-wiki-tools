@@ -1,0 +1,5 @@
+* text=auto !eol
+/README.md -text
+/dixTable.py -text
+/langTable.py -text
+/udhrTable.py -text
