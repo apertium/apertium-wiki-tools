@@ -1,5 +1,5 @@
 * text=auto !eol
-/README.md -text
-/dixTable.py -text
-/langTable.py -text
-/udhrTable.py -text
+/README.md eol=lf
+/dixTable.py eol=lf
+/langTable.py eol=lf
+/udhrTable.py eol=lf
