@@ -1,5 +1,6 @@
 * text=auto !eol
 /README.md eol=lf
+/bot.py -text
 /dixTable.py eol=lf
 /langTable.py eol=lf
 /udhrTable.py eol=lf
