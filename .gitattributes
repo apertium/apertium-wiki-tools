@@ -3,4 +3,5 @@
 /bot.py -text
 /dixTable.py eol=lf
 /langTable.py eol=lf
+/spider.py -text
 /udhrTable.py eol=lf
