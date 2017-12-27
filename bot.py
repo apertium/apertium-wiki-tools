@@ -575,5 +575,6 @@ if __name__ == '__main__':
                 pageContents = addCorporaSection(pageContents)
                 pageContents = updateCoverageStats(pageContents, coverage, words, lang)
                 editPage(pageTitle, pageContents, editToken)
+            shutil.rmtree('apertium-' + lang, ignore_errors=True)
         else:
             logging.error('Error, no content for this website!')
