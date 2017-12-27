@@ -556,12 +556,12 @@ if __name__ == '__main__':
                 logging.error('Invalid language module name: %s' % pair)
     elif args.action == 'coverage':
         lang = args.pairs[0]
-        #wikiPath, coverage = autocoverage.StartScript(False, False, '', lang)
-        #words = autocoverage.CountWords(wikiPath)
-        coverage = 93.32132
-        words = 3768235
-        #pageTitle = 'Apertium-' + lang + '/stats'
-        pageTitle = 'Apertium-test/teststats/'
+        wikiPath, coverage = autocoverage.StartScript(False, False, '', lang)
+        words = autocoverage.CountWords(wikiPath)
+        #coverage = 93.32132
+        #words = 3768235
+        pageTitle = 'Apertium-' + lang + '/stats'
+        #pageTitle = 'Apertium-test/teststats/'
 
         pageContents = getPage(pageTitle)
 
