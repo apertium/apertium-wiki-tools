@@ -7,6 +7,8 @@ lexccounterURL = svnURL + 'trunk/apertium-tools/lexccounter.py'
 
 import argparse, requests, json, logging, sys, re, os, subprocess, shutil, importlib, urllib.request, collections, tempfile
 import xml.etree.ElementTree as etree
+import datetime
+import autocoverage
 try:
     from lexccounter import countStems
 except ImportError:
@@ -351,6 +353,62 @@ def login(loginName, password):
     except Exception as e:
         logging.critical('Failed to login: %s' % e)
 
+def human_format(num):
+    num = float('{:.2g}'.format(num))
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
+
+def addCorporaSection(pageContents):
+    pageContents.replace('[[Category:Datastats]]\n', '').replace('[[Category:Datastats]]', '')
+    pageContents += '\n== Corpora ==\n'
+    pageContents += '[[Category:Datastats]]'
+    return pageContents
+
+def updateCoverageStats(pageContents, coverage, words, lang):
+    newPageContents = ''
+
+    templateLine = re.compile('==\s*.*\s*==')
+    wpName = 'wp%s' % datetime.datetime.now().year
+
+    isCorpora = False
+    isAfter = False
+
+    beforeSection = ''
+    middleSection = ''
+    afterSection = ''
+
+    lines = pageContents.split('\n')
+    for line in lines:
+        if isCorpora:
+            middleSection += line + '\n'
+        elif isAfter:
+            afterSection += line + '\n'
+        else:
+            beforeSection += line + '\n'
+
+        if templateLine.match(line):
+            if 'Corpora' in line:
+                isCorpora = True
+            elif isCorpora:
+                isCorpora = False
+                isAfter = True
+
+    wpName, words, coverage, revision_num = str(wpName), human_format(words), '{0:.1f}'.format(coverage), getRevisionInfo('https://svn.code.sf.net/p/apertium/svn/languages/apertium-' + lang + '/')
+    middleSection = middleSection.replace('[[Category:Datastats]]\n', '').replace('[[Category:Datastats]]', '')
+    while middleSection.endswith('\n'):
+        middleSection = middleSection[:-2]
+    middleSection += '\n\n' + wpName + '\n'
+    middleSection += '* words: <section begin=' + wpName + '-words />' + words + '<section end=' + wpName + '-words />\n'
+    middleSection += '* coverage: ~<section begin=' + wpName + '-coverage />' + coverage + '<section end=' + wpName + '-coverage />%\n'
+    middleSection += '* as of: ' + 'r' + revision_num[0] + '\n'
+    afterSection += '[[Category:Datastats]]'
+
+    newPageContents = beforeSection + middleSection + afterSection
+    return newPageContents
+
 def getToken(tokenType, props):
     try:
         payload = {'action': 'query', 'format': 'json', 'prop': props, 'intoken': tokenType, 'titles':'Main Page'}
@@ -377,10 +435,10 @@ if __name__ == '__main__':
     if args.action == 'coverage':
         if not args.pairs:
             parser.error('action "coverage" requires pairs (-p, --pairs) argument')
-        elif not args.analyzers:
-            parser.error('action "coverage" requires analyzers (-a, --analyzers) argument')
-        elif not len(args.pairs) == len(args.analyzers):
-            parser.error('action "coverage" requires --analyzers and --pairs to be the same length')
+        #elif not args.analyzers:
+        #    parser.error('action "coverage" requires analyzers (-a, --analyzers) argument')
+        #elif not len(args.pairs) == len(args.analyzers):
+        #    parser.error('action "coverage" requires --analyzers and --pairs to be the same length')
 
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -481,4 +539,25 @@ if __name__ == '__main__':
             else:
                 logging.error('Invalid language module name: %s' % pair)
     elif args.action == 'coverage':
-       raise NotImplementedError
+        lang = args.pairs[0]
+        wikiPath, coverage = autocoverage.StartScript(False, False, '', lang)
+        words = autocoverage.CountWords(wikiPath)
+        #coverage = 50.32132
+        #words = 4768235
+        pageTitle = 'Apertium-' + lang + '/stats'
+        #pageTitle = 'Apertium-test/teststats/'
+
+        pageContents = getPage(pageTitle)
+
+        if pageContents:
+
+            corporaSection = re.search(r'==\s*Corpora\s*==', pageContents, re.IGNORECASE)
+            if corporaSection:
+                pageContents = updateCoverageStats(pageContents, coverage, words, lang)
+                editPage(pageTitle, pageContents, editToken)
+            else:
+                pageContents = addCorporaSection(pageContents)
+                pageContents = updateCoverageStats(pageContents, coverage, words, lang)
+                editPage(pageTitle, pageContents, editToken)
+        else:
+            logging.error('Error, no content for this website!')
