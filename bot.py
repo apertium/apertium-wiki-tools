@@ -377,10 +377,14 @@ def updateCoverageStats(pageContents, coverage, words, lang):
     isAfter = False
 
     beforeSection = ''
+    newMiddleSection = ''
     middleSection = ''
     afterSection = ''
 
     lines = pageContents.split('\n')
+
+    wpExists = re.search(wpName+'\n', pageContents, re.IGNORECASE)
+
     for line in lines:
         if isCorpora:
             middleSection += line + '\n'
@@ -392,20 +396,32 @@ def updateCoverageStats(pageContents, coverage, words, lang):
         if templateLine.match(line):
             if 'Corpora' in line:
                 isCorpora = True
-            elif isCorpora:
-                isCorpora = False
-                isAfter = True
+        elif line.startswith(wpName):
+            isAfter = True
+        elif isCorpora and isAfter and line == '':
+            isCorpora = False
 
-    wpName, words, coverage, revision_num = str(wpName), human_format(words), '{0:.1f}'.format(coverage), getRevisionInfo('https://svn.code.sf.net/p/apertium/svn/languages/apertium-' + lang + '/')
+    words, coverage, revision_num = human_format(words), '{0:.1f}'.format(coverage), getRevisionInfo('https://svn.code.sf.net/p/apertium/svn/languages/apertium-' + lang + '/')
     middleSection = middleSection.replace('[[Category:Datastats]]\n', '').replace('[[Category:Datastats]]', '')
-    while middleSection.endswith('\n'):
-        middleSection = middleSection[:-2]
-    middleSection += '\n\n' + wpName + '\n'
-    middleSection += '* words: <section begin=' + wpName + '-words />' + words + '<section end=' + wpName + '-words />\n'
-    middleSection += '* coverage: ~<section begin=' + wpName + '-coverage />' + coverage + '<section end=' + wpName + '-coverage />%\n'
-    middleSection += '* as of: ' + 'r' + revision_num[0] + '\n'
-    afterSection += '[[Category:Datastats]]'
+    afterSection = afterSection.replace('[[Category:Datastats]]\n', '').replace('[[Category:Datastats]]', '')
 
+    if not wpExists:
+        while middleSection.endswith('\n'):
+            middleSection = middleSection[:-2]
+        middleSection += '\n\n' + wpName + '\n'
+        middleSection += '* words: <section begin=' + wpName + '-words />' + words + '<section end=' + wpName + '-words />\n'
+        middleSection += '* coverage: ~<section begin=' + wpName + '-coverage />' + coverage + '<section end=' + wpName + '-coverage />%\n'
+        middleSection += '* as of: r' + revision_num[0] + '\n'
+    else:
+        wpSection = ''
+        wpSection += wpName + '\n'
+        wpSection += '* words: <section begin=' + wpName + '-words />' + words + '<section end=' + wpName + '-words />\n'
+        wpSection += '* coverage: ~<section begin=' + wpName + '-coverage />' + coverage + '<section end=' + wpName + '-coverage />%\n'
+        wpSection += '* as of: r' + revision_num[0] + '\n'
+
+        middleSection = middleSection[:middleSection.index(wpName+'\n')] + wpSection + middleSection[len(middleSection)-1]
+
+    afterSection += '[[Category:Datastats]]'
     newPageContents = beforeSection + middleSection + afterSection
     return newPageContents
 
@@ -540,12 +556,12 @@ if __name__ == '__main__':
                 logging.error('Invalid language module name: %s' % pair)
     elif args.action == 'coverage':
         lang = args.pairs[0]
-        wikiPath, coverage = autocoverage.StartScript(False, False, '', lang)
-        words = autocoverage.CountWords(wikiPath)
-        #coverage = 50.32132
-        #words = 4768235
-        pageTitle = 'Apertium-' + lang + '/stats'
-        #pageTitle = 'Apertium-test/teststats/'
+        #wikiPath, coverage = autocoverage.StartScript(False, False, '', lang)
+        #words = autocoverage.CountWords(wikiPath)
+        coverage = 93.32132
+        words = 3768235
+        #pageTitle = 'Apertium-' + lang + '/stats'
+        pageTitle = 'Apertium-test/teststats/'
 
         pageContents = getPage(pageTitle)
 
