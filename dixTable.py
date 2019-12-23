@@ -237,14 +237,14 @@ if __name__ == '__main__':
 
     gitData = json.loads(urllib.request.urlopen("https://apertium.projectjj.com/stats-service/packages/").read())["packages"]
     for package in gitData:
-        langDir = re.findall(r"(apertium-(\w+)-(\w+))", package["name"], re.DOTALL)
-        if langDir:
-            langDir = langDir[0]
+        packageMatch = re.search(r"(apertium-(\w+)-(\w+))", package["name"])
+        if packageMatch:
+            packageName, srcLang, targetLang = packageMatch.groups()
             dirPath = ''.join(set(package["topics"]) & set(["apertium-%s" % dir for dir in dirPaths]))[len("apertium-"):]
-            if set(langDir[1:]) <= languages:
-                primaryPairs[frozenset({langDir[1], langDir[2]})] = (dirPath, langDir[0])
-            elif langDir[1] in languages or langDir[2] in languages:
-                secondaryPairs[frozenset({langDir[1], langDir[2]})] = (dirPath, langDir[0])
+            if {srcLang, targetLang} <= languages:
+                primaryPairs[frozenset({srcLang, targetLang})] = (dirPath, packageName)
+            elif srcLang in languages or targetLang in languages:
+                secondaryPairs[frozenset({srcLang, targetLang})] = (dirPath, packageName)
 
     pairFormatting = {'trunk': "'''", 'incubator': "''", 'nursery': "", 'staging': "'''''"}
 
