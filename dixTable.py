@@ -240,7 +240,7 @@ if __name__ == '__main__':
         packageMatch = re.search(r"(apertium-(\w+)-(\w+))", package["name"])
         if packageMatch:
             packageName, srcLang, targetLang = packageMatch.groups()
-            dirPath = list(set(package["topics"]) & set(dirPaths))[0][len("apertium-"):]
+            dirPath = list(set(package["topics"]) & dirPaths)[0][len("apertium-"):]
             if {srcLang, targetLang} <= languages:
                 primaryPairs[frozenset({srcLang, targetLang})] = (dirPath, packageName)
             elif srcLang in languages or targetLang in languages:
