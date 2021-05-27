@@ -89,7 +89,7 @@ def updateOrCreatePages(location, pairName, updateStats, editToken):
             pageContents = addCategory(pageContents)
             editResult = editPage(statsPageTitle, pageContents, editToken)
             if editResult['edit']['result'] == 'Success':
-                logging.info('Update of page {0} succeeded ({1}{0})'.format(statsPageTitle, 'http://wiki.apertium.org/wiki/'))
+                logging.info('Update of page {0} succeeded ({1}{0})'.format(statsPageTitle, 'https://wiki.apertium.org/wiki/'))
             else:
                 logging.error('Update of page %s failed: %s' % (statsPageTitle, editResult))
         else:
@@ -98,7 +98,7 @@ def updateOrCreatePages(location, pairName, updateStats, editToken):
 
             editResult = editPage(statsPageTitle, pageContents, editToken)
             if editResult['edit']['result'] == 'Success':
-                logging.info('Creation of page {0} succeeded ({1}{0})'.format(statsPageTitle, 'http://wiki.apertium.org/wiki/'))
+                logging.info('Creation of page {0} succeeded ({1}{0})'.format(statsPageTitle, 'https://wiki.apertium.org/wiki/'))
             else:
                 logging.error('Creation of page %s failed: %s' % (statsPageTitle, editResult.text))
     else:
@@ -160,7 +160,7 @@ def updateOrCreatePages(location, pairName, updateStats, editToken):
 
             editResult = editPage(statusPageTitle, pageContents, editToken)
             if editResult['edit']['result'] == 'Success':
-                logging.info('Creation of page {0} succeeded ({1}{0})'.format(statusPageTitle, 'http://wiki.apertium.org/wiki/'))
+                logging.info('Creation of page {0} succeeded ({1}{0})'.format(statusPageTitle, 'https://wiki.apertium.org/wiki/'))
             else:
                 logging.error('Creation of page %s failed: %s' % (statusPageTitle, editResult.text))
         else:
@@ -323,7 +323,7 @@ if __name__ == '__main__':
                 languagePage = languagePage[:languagePageDixTable.start()] + dixTable + languagePage[languagePage.index('|}', languagePageDixTable.start()) + 2:]
                 editResult = editPage(languagePageTitle, languagePage, editToken)
                 if editResult['edit']['result'] == 'Success':
-                    logging.info('Update of page {0} succeeded ({1}{0})'.format(languagePageTitle, 'http://wiki.apertium.org/wiki/'))
+                    logging.info('Update of page {0} succeeded ({1}{0})'.format(languagePageTitle, 'https://wiki.apertium.org/wiki/'))
                 else:
                     logging.error('Update of page %s failed: %s' % (repr(languagePageTitle), editResult))
             else:

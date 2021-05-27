@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-wikiURL = 'http://wiki.apertium.org/wiki/'
-apiURL = 'http://wiki.apertium.org/w/api.php'
+wikiURL = 'https://wiki.apertium.org/wiki/'
+apiURL = 'https://wiki.apertium.org/w/api.php'
 svnURL = 'https://svn.code.sf.net/p/apertium/svn/'
 lexccounterURL = svnURL + 'trunk/apertium-tools/lexccounter.py'
 

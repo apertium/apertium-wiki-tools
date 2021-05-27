@@ -3,7 +3,7 @@
 import argparse, requests, json, logging, re
 import xml.etree.ElementTree as etree
 
-apiURL = 'http://wiki.apertium.org/w/api.php'
+apiURL = 'https://wiki.apertium.org/w/api.php'
 
 def getPage(pageTitle):
     payload = {'action': 'query', 'format': 'json', 'titles': pageTitle, 'prop': 'revisions', 'rvprop': 'content'}
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         sys.exit(-1)
     
     statsPages = set()
-    for page in ['http://wiki.apertium.org/w/index.php?title=Special:PrefixIndex&from=Apertium-nn-nb&prefix=Apertium-', 'http://wiki.apertium.org/w/index.php?title=Special%3APrefixIndex&prefix=Apertium-']:
+    for page in ['https://wiki.apertium.org/w/index.php?title=Special:PrefixIndex&from=Apertium-nn-nb&prefix=Apertium-', 'https://wiki.apertium.org/w/index.php?title=Special%3APrefixIndex&prefix=Apertium-']:
         dixTree = etree.fromstring(s.get(page).text)
         for cell in dixTree.findall('.//td/a'):
             if re.match(r'Apertium-[a-z]{2,3}-[a-z]{2,3}/stats', cell.text):
